@@ -13,82 +13,188 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AuthedImport } from './routes/_authed'
+import { Route as publicLoginImport } from './routes/(public)/login'
+import { Route as AuthedProblemsIndexImport } from './routes/_authed/problems/index'
+import { Route as AuthedProblemsScreenImport } from './routes/_authed/problems/_screen'
+import { Route as AuthedProblemsScreenSlugImport } from './routes/_authed/problems/_screen.$slug'
 
 // Create Virtual Routes
 
-const AboutLazyImport = createFileRoute('/about')()
-const IndexLazyImport = createFileRoute('/')()
+const AuthedProblemsImport = createFileRoute('/_authed/problems')()
 
 // Create/Update Routes
 
-const AboutLazyRoute = AboutLazyImport.update({
-  id: '/about',
-  path: '/about',
+const AuthedRoute = AuthedImport.update({
+  id: '/_authed',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+} as any)
 
-const IndexLazyRoute = IndexLazyImport.update({
+const AuthedProblemsRoute = AuthedProblemsImport.update({
+  id: '/problems',
+  path: '/problems',
+  getParentRoute: () => AuthedRoute,
+} as any)
+
+const publicLoginRoute = publicLoginImport.update({
+  id: '/(public)/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthedProblemsIndexRoute = AuthedProblemsIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+  getParentRoute: () => AuthedProblemsRoute,
+} as any)
+
+const AuthedProblemsScreenRoute = AuthedProblemsScreenImport.update({
+  id: '/_screen',
+  getParentRoute: () => AuthedProblemsRoute,
+} as any)
+
+const AuthedProblemsScreenSlugRoute = AuthedProblemsScreenSlugImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AuthedProblemsScreenRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthedImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutLazyImport
+    '/(public)/login': {
+      id: '/(public)/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof publicLoginImport
       parentRoute: typeof rootRoute
+    }
+    '/_authed/problems': {
+      id: '/_authed/problems'
+      path: '/problems'
+      fullPath: '/problems'
+      preLoaderRoute: typeof AuthedProblemsImport
+      parentRoute: typeof AuthedImport
+    }
+    '/_authed/problems/_screen': {
+      id: '/_authed/problems/_screen'
+      path: '/problems'
+      fullPath: '/problems'
+      preLoaderRoute: typeof AuthedProblemsScreenImport
+      parentRoute: typeof AuthedProblemsRoute
+    }
+    '/_authed/problems/': {
+      id: '/_authed/problems/'
+      path: '/'
+      fullPath: '/problems/'
+      preLoaderRoute: typeof AuthedProblemsIndexImport
+      parentRoute: typeof AuthedProblemsImport
+    }
+    '/_authed/problems/_screen/$slug': {
+      id: '/_authed/problems/_screen/$slug'
+      path: '/$slug'
+      fullPath: '/problems/$slug'
+      preLoaderRoute: typeof AuthedProblemsScreenSlugImport
+      parentRoute: typeof AuthedProblemsScreenImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface AuthedProblemsScreenRouteChildren {
+  AuthedProblemsScreenSlugRoute: typeof AuthedProblemsScreenSlugRoute
+}
+
+const AuthedProblemsScreenRouteChildren: AuthedProblemsScreenRouteChildren = {
+  AuthedProblemsScreenSlugRoute: AuthedProblemsScreenSlugRoute,
+}
+
+const AuthedProblemsScreenRouteWithChildren =
+  AuthedProblemsScreenRoute._addFileChildren(AuthedProblemsScreenRouteChildren)
+
+interface AuthedProblemsRouteChildren {
+  AuthedProblemsScreenRoute: typeof AuthedProblemsScreenRouteWithChildren
+  AuthedProblemsIndexRoute: typeof AuthedProblemsIndexRoute
+}
+
+const AuthedProblemsRouteChildren: AuthedProblemsRouteChildren = {
+  AuthedProblemsScreenRoute: AuthedProblemsScreenRouteWithChildren,
+  AuthedProblemsIndexRoute: AuthedProblemsIndexRoute,
+}
+
+const AuthedProblemsRouteWithChildren = AuthedProblemsRoute._addFileChildren(
+  AuthedProblemsRouteChildren,
+)
+
+interface AuthedRouteChildren {
+  AuthedProblemsRoute: typeof AuthedProblemsRouteWithChildren
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedProblemsRoute: AuthedProblemsRouteWithChildren,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
+  '': typeof AuthedRouteWithChildren
+  '/login': typeof publicLoginRoute
+  '/problems': typeof AuthedProblemsScreenRouteWithChildren
+  '/problems/': typeof AuthedProblemsIndexRoute
+  '/problems/$slug': typeof AuthedProblemsScreenSlugRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
+  '': typeof AuthedRouteWithChildren
+  '/login': typeof publicLoginRoute
+  '/problems': typeof AuthedProblemsIndexRoute
+  '/problems/$slug': typeof AuthedProblemsScreenSlugRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
+  '/_authed': typeof AuthedRouteWithChildren
+  '/(public)/login': typeof publicLoginRoute
+  '/_authed/problems': typeof AuthedProblemsRouteWithChildren
+  '/_authed/problems/_screen': typeof AuthedProblemsScreenRouteWithChildren
+  '/_authed/problems/': typeof AuthedProblemsIndexRoute
+  '/_authed/problems/_screen/$slug': typeof AuthedProblemsScreenSlugRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '' | '/login' | '/problems' | '/problems/' | '/problems/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '' | '/login' | '/problems' | '/problems/$slug'
+  id:
+    | '__root__'
+    | '/_authed'
+    | '/(public)/login'
+    | '/_authed/problems'
+    | '/_authed/problems/_screen'
+    | '/_authed/problems/'
+    | '/_authed/problems/_screen/$slug'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  AboutLazyRoute: typeof AboutLazyRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
+  publicLoginRoute: typeof publicLoginRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
-  AboutLazyRoute: AboutLazyRoute,
+  AuthedRoute: AuthedRouteWithChildren,
+  publicLoginRoute: publicLoginRoute,
 }
 
 export const routeTree = rootRoute
@@ -101,15 +207,41 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/about"
+        "/_authed",
+        "/(public)/login"
       ]
     },
-    "/": {
-      "filePath": "index.lazy.tsx"
+    "/_authed": {
+      "filePath": "_authed.tsx",
+      "children": [
+        "/_authed/problems"
+      ]
     },
-    "/about": {
-      "filePath": "about.lazy.tsx"
+    "/(public)/login": {
+      "filePath": "(public)/login.tsx"
+    },
+    "/_authed/problems": {
+      "filePath": "_authed/problems",
+      "parent": "/_authed",
+      "children": [
+        "/_authed/problems/_screen",
+        "/_authed/problems/"
+      ]
+    },
+    "/_authed/problems/_screen": {
+      "filePath": "_authed/problems/_screen.tsx",
+      "parent": "/_authed/problems",
+      "children": [
+        "/_authed/problems/_screen/$slug"
+      ]
+    },
+    "/_authed/problems/": {
+      "filePath": "_authed/problems/index.tsx",
+      "parent": "/_authed/problems"
+    },
+    "/_authed/problems/_screen/$slug": {
+      "filePath": "_authed/problems/_screen.$slug.tsx",
+      "parent": "/_authed/problems/_screen"
     }
   }
 }
