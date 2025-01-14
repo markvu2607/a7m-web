@@ -8,8 +8,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     component: () => (
       <>
         <Outlet />
-        <ReactQueryDevtools buttonPosition="top-right" />
-        <TanStackRouterDevtools position="bottom-right" />
+        <ReactQueryDevtools />
+        <TanStackRouterDevtools />
       </>
     ),
   }
