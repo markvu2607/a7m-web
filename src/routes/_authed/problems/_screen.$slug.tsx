@@ -20,6 +20,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CodeAction } from "@/features/problems/components/code-action";
 import { CodeEditor } from "@/features/problems/components/code-editor";
 
 export const Route = createFileRoute("/_authed/problems/_screen/$slug")({
@@ -133,14 +134,32 @@ function RouteComponent() {
       <ResizablePanel defaultSize={50}>
         <ResizablePanelGroup direction="vertical">
           <ResizablePanel defaultSize={70}>
-            <div className="flex h-full items-center justify-center p-6">
+            <div className="flex flex-col gap-2 h-full p-4">
               <CodeEditor />
+              <CodeAction
+                onRun={() => {
+                  console.log("Click run!");
+                }}
+                onSubmit={() => {
+                  console.log("Click submit!");
+                }}
+              />
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={30}>
-            <div className="flex h-full items-center justify-center p-6">
-              <span className="font-semibold">Three</span>
+            <div className="flex flex-col gap-2 h-full p-4">
+              <p className="font-semibold">Testcase</p>
+              <Tabs defaultValue="test-1" className="h-full flex flex-col">
+                <TabsList className="w-full rounded-none justify-start">
+                  <TabsTrigger value="test-1">Test 1</TabsTrigger>
+                  <TabsTrigger value="test-2">Test 2</TabsTrigger>
+                  <TabsTrigger value="test-3">Test 3</TabsTrigger>
+                </TabsList>
+                <TabsContent value="test-1">test case 1 content</TabsContent>
+                <TabsContent value="test-2">test case 2 content</TabsContent>
+                <TabsContent value="test-3">test case 3 content</TabsContent>
+              </Tabs>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>

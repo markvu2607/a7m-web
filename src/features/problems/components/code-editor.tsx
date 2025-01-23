@@ -9,7 +9,7 @@ export const CodeEditor = () => {
       value={`print("Hello world!")`}
       theme={vscodeDark}
       extensions={extensions}
-      height="100%"
+      className="flex-1 [&>.cm-editor]:h-full"
     />
   );
 };
