@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance } from "axios";
 
 const api: AxiosInstance = axios.create({
-  baseURL: `${process.env.API_URL}/api`,
+  baseURL: process.env.API_URL,
 });
 
 api.interceptors.request.use((config) => {
