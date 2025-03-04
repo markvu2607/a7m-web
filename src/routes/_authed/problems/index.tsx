@@ -1,15 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
+import { getProblems } from "@/features/problems/services";
+
 export const Route = createFileRoute("/_authed/problems/")({
   loader: async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const response = await getProblems();
+    if (response.status === "error") {
+      throw new Error(response.message);
+    }
+    if (!response.data) {
+      throw new Error("No data");
+    }
     return {
-      problems: [
-        {
-          slug: "word-subsets",
-          title: "Word Subsets",
-        },
-      ],
+      problems: response.data,
     };
   },
   component: RouteComponent,

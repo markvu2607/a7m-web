@@ -14,6 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as AuthedImport } from './routes/_authed'
+import { Route as publicRegisterImport } from './routes/(public)/register'
 import { Route as publicLoginImport } from './routes/(public)/login'
 import { Route as AuthedProblemsIndexImport } from './routes/_authed/problems/index'
 import { Route as AuthedProblemsScreenImport } from './routes/_authed/problems/_screen'
@@ -34,6 +35,12 @@ const AuthedProblemsRoute = AuthedProblemsImport.update({
   id: '/problems',
   path: '/problems',
   getParentRoute: () => AuthedRoute,
+} as any)
+
+const publicRegisterRoute = publicRegisterImport.update({
+  id: '/(public)/register',
+  path: '/register',
+  getParentRoute: () => rootRoute,
 } as any)
 
 const publicLoginRoute = publicLoginImport.update({
@@ -75,6 +82,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof publicLoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/(public)/register': {
+      id: '/(public)/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof publicRegisterImport
       parentRoute: typeof rootRoute
     }
     '/_authed/problems': {
@@ -149,6 +163,7 @@ const AuthedRouteWithChildren =
 export interface FileRoutesByFullPath {
   '': typeof AuthedRouteWithChildren
   '/login': typeof publicLoginRoute
+  '/register': typeof publicRegisterRoute
   '/problems': typeof AuthedProblemsScreenRouteWithChildren
   '/problems/': typeof AuthedProblemsIndexRoute
   '/problems/$slug': typeof AuthedProblemsScreenSlugRoute
@@ -157,6 +172,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '': typeof AuthedRouteWithChildren
   '/login': typeof publicLoginRoute
+  '/register': typeof publicRegisterRoute
   '/problems': typeof AuthedProblemsIndexRoute
   '/problems/$slug': typeof AuthedProblemsScreenSlugRoute
 }
@@ -165,6 +181,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/(public)/login': typeof publicLoginRoute
+  '/(public)/register': typeof publicRegisterRoute
   '/_authed/problems': typeof AuthedProblemsRouteWithChildren
   '/_authed/problems/_screen': typeof AuthedProblemsScreenRouteWithChildren
   '/_authed/problems/': typeof AuthedProblemsIndexRoute
@@ -173,13 +190,20 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/login' | '/problems' | '/problems/' | '/problems/$slug'
+  fullPaths:
+    | ''
+    | '/login'
+    | '/register'
+    | '/problems'
+    | '/problems/'
+    | '/problems/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/login' | '/problems' | '/problems/$slug'
+  to: '' | '/login' | '/register' | '/problems' | '/problems/$slug'
   id:
     | '__root__'
     | '/_authed'
     | '/(public)/login'
+    | '/(public)/register'
     | '/_authed/problems'
     | '/_authed/problems/_screen'
     | '/_authed/problems/'
@@ -190,11 +214,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
   publicLoginRoute: typeof publicLoginRoute
+  publicRegisterRoute: typeof publicRegisterRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
   publicLoginRoute: publicLoginRoute,
+  publicRegisterRoute: publicRegisterRoute,
 }
 
 export const routeTree = rootRoute
@@ -208,7 +234,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/_authed",
-        "/(public)/login"
+        "/(public)/login",
+        "/(public)/register"
       ]
     },
     "/_authed": {
@@ -219,6 +246,9 @@ export const routeTree = rootRoute
     },
     "/(public)/login": {
       "filePath": "(public)/login.tsx"
+    },
+    "/(public)/register": {
+      "filePath": "(public)/register.tsx"
     },
     "/_authed/problems": {
       "filePath": "_authed/problems",

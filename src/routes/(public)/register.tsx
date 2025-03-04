@@ -1,4 +1,3 @@
-import { loginSchema } from "@/features/auth/schemas/login.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
@@ -12,11 +11,14 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useLoginMutation } from "@/features/auth/queries/use-login-mutation";
-import { LoginSchema } from "@/features/auth/schemas/login.schema";
+import { useRegisterMutation } from "@/features/auth/queries/use-register-mutation";
+import {
+  RegisterSchema,
+  registerSchema,
+} from "@/features/auth/schemas/register.schema";
 import pbClient from "@/lib/pb-client";
 
-export const Route = createFileRoute("/(public)/login")({
+export const Route = createFileRoute("/(public)/register")({
   loader: async () => {
     const isAuthenticated = pbClient.authStore.isValid;
     if (isAuthenticated) {
@@ -27,23 +29,25 @@ export const Route = createFileRoute("/(public)/login")({
 });
 
 function RouteComponent() {
-  const form = useForm<LoginSchema>({
+  const form = useForm<RegisterSchema>({
     defaultValues: {
       email: "",
       password: "",
+      passwordConfirm: "",
+      name: "",
     },
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(registerSchema),
   });
 
-  const { mutate: login, isPending } = useLoginMutation();
+  const { mutate: register, isPending } = useRegisterMutation();
 
-  const handleLogin = async (data: LoginSchema) => {
-    login(data);
+  const handleRegister = async (data: RegisterSchema) => {
+    register(data);
   };
 
   return (
     <Form {...form}>
-      <form className="grid gap-4" onSubmit={form.handleSubmit(handleLogin)}>
+      <form className="grid gap-4" onSubmit={form.handleSubmit(handleRegister)}>
         <FormField
           control={form.control}
           name="email"
@@ -68,8 +72,32 @@ function RouteComponent() {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="passwordConfirm"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="passwordConfirm">Confirm Password</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="name">Name</FormLabel>
+              <FormControl>
+                <Input type="text" {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
         <Button className="font-bold" type="submit" disabled={isPending}>
-          Login
+          Register
         </Button>
       </form>
     </Form>

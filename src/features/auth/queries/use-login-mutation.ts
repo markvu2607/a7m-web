@@ -1,17 +1,23 @@
 import { useMutation } from "@tanstack/react-query";
-import { useLocalStorage } from "usehooks-ts";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 import { LoginSchema } from "../schemas/login.schema";
+import { login } from "../services";
 
 export const useLoginMutation = () => {
-  const [, setIsAuthenticated] = useLocalStorage("isAuthenticated", false);
-
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: async (data: LoginSchema) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      if (data.email === "markvu.work@gmail.com") {
-        setIsAuthenticated(true);
-      }
+      const { email, password } = data;
+      await login(email, password);
+    },
+    onSuccess: () => {
+      toast.success("Login successful");
+      navigate({ to: "/problems" });
+    },
+    onError: () => {
+      toast.error("Login failed");
     },
   });
 };

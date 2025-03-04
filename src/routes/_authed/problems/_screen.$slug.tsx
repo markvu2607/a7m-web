@@ -22,34 +22,19 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeAction } from "@/features/problems/components/code-action";
 import { CodeEditor } from "@/features/problems/components/code-editor";
+import { getProblemBySlug } from "@/features/problems/services";
 
 export const Route = createFileRoute("/_authed/problems/_screen/$slug")({
   loader: async ({ params }) => {
-    const problems = {
-      index: 1,
-      slug: params.slug,
-      title: "Word Subsets",
-      difficulty: "Medium",
-      topics: [
-        {
-          slug: "array",
-          name: "Array",
-        },
-        {
-          slug: "string",
-          name: "String",
-        },
-        {
-          slug: "hash-table",
-          name: "Hash Table",
-        },
-      ],
-      description:
-        "Given two arrays of strings, A and B, determine all elements in A that are universal to all strings in B.",
-    };
-
+    const response = await getProblemBySlug(params.slug);
+    if (response.status === "error") {
+      throw new Error(response.message);
+    }
+    if (!response.data) {
+      throw new Error("No data");
+    }
     return {
-      problems,
+      problems: response.data,
     };
   },
   component: RouteComponent,
@@ -81,11 +66,11 @@ function RouteComponent() {
               <Badge variant="secondary" className="text-yellow-500">
                 {problems.difficulty}
               </Badge>
-              {problems.topics.map((topic) => (
+              {/* {problems.topics.map((topic) => (
                 <Badge variant="secondary" key={topic.slug}>
                   {topic.name}
                 </Badge>
-              ))}
+              ))} */}
             </div>
             <p>{problems.description}</p>
             <Accordion type="multiple">

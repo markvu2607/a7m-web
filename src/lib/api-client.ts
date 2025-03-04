@@ -1,11 +1,13 @@
 import axios, { type AxiosInstance } from "axios";
 
+import pbClient from "./pb-client";
+
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.API_URL,
+  baseURL: `${import.meta.env.VITE_API_URL}/api`,
 });
 
 api.interceptors.request.use((config) => {
-  const accessToken = localStorage.getItem("accessToken");
+  const accessToken = pbClient.authStore.token;
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
