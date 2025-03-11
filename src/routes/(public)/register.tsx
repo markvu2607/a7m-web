@@ -16,11 +16,10 @@ import {
   RegisterSchema,
   registerSchema,
 } from "@/features/auth/schemas/register.schema";
-import pbClient from "@/lib/pb-client";
-
+import { useAuth } from "@/features/auth/store";
 export const Route = createFileRoute("/(public)/register")({
   loader: async () => {
-    const isAuthenticated = pbClient.authStore.isValid;
+    const isAuthenticated = useAuth.getState().token;
     if (isAuthenticated) {
       throw redirect({ to: "/problems" });
     }

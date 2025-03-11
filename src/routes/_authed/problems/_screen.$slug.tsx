@@ -27,8 +27,8 @@ import { getProblemBySlug } from "@/features/problems/services";
 export const Route = createFileRoute("/_authed/problems/_screen/$slug")({
   loader: async ({ params }) => {
     const response = await getProblemBySlug(params.slug);
-    if (response.status === "error") {
-      throw new Error(response.message);
+    if (!response.success) {
+      throw new Error(response.message as string);
     }
     if (!response.data) {
       throw new Error("No data");

@@ -1,15 +1,22 @@
 export type ApiResponseError = {
-  status: "error";
-  errors?: string[];
+  success?: false;
+  error?: string;
 };
 
 export type ApiResponseSuccess<T> = {
-  status: "success";
+  success: true;
   data?: T;
-  meta?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 };
 
 export type ApiResponse<T> = {
   statusCode: number;
-  message: string;
+  message: string | string[];
 } & (ApiResponseSuccess<T> | ApiResponseError);
+
+export type User = {
+  id: string;
+  email: string;
+  username: string;
+  isVerified: boolean;
+};

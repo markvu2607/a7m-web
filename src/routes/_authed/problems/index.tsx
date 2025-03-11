@@ -5,8 +5,8 @@ import { getProblems } from "@/features/problems/services";
 export const Route = createFileRoute("/_authed/problems/")({
   loader: async () => {
     const response = await getProblems();
-    if (response.status === "error") {
-      throw new Error(response.message);
+    if (!response.success) {
+      throw new Error(response.message as string);
     }
     if (!response.data) {
       throw new Error("No data");
