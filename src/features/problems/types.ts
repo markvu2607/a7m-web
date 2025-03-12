@@ -4,7 +4,7 @@ export type Problem = {
   index: number;
   title: string;
   description: string;
-  difficulty: string;
+  difficulty: ProblemDifficulty;
 };
 
 export type ProblemDifficulty = "EASY" | "MEDIUM" | "HARD";

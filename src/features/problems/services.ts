@@ -1,13 +1,10 @@
 import api from "@/lib/api-client";
 import { ApiResponse } from "@/types";
+
 import { Problem } from "./types";
 
-export const getProblems = async (): Promise<ApiResponse<Problem[]>> => {
-  return await api.get("/problems");
-};
+export const getProblems = (): Promise<ApiResponse<Problem[]>> =>
+  api.get("/problems");
 
-export const getProblemBySlug = async (
-  slug: string
-): Promise<ApiResponse<Problem>> => {
-  return await api.get(`/problems/${slug}`);
-};
+export const getProblemBySlug = (slug: string): Promise<ApiResponse<Problem>> =>
+  api.get(`/problems/${slug}`);
