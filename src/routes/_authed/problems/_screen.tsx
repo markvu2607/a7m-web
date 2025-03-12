@@ -6,7 +6,7 @@ export const Route = createFileRoute("/_authed/problems/_screen")({
 
 function ScreenLayout() {
   return (
-    <div className="h-screen p-2">
+    <div className="h-[calc(100vh-3rem)] p-2">
       <Outlet />
     </div>
   );

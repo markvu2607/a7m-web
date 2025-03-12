@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import {
   ListPlusIcon,
   MessageCircleCodeIcon,
@@ -22,27 +22,33 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeAction } from "@/features/problems/components/code-action";
 import { CodeEditor } from "@/features/problems/components/code-editor";
-import { getProblemBySlug } from "@/features/problems/services";
+import { getProblemDetailQueryOptions } from "@/features/problems/queries/get-problem-detail";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authed/problems/_screen/$slug")({
-  loader: async ({ params }) => {
-    const response = await getProblemBySlug(params.slug);
+  loader: async ({ context: { queryClient }, params }) => {
+    const response = await queryClient.ensureQueryData(
+      getProblemDetailQueryOptions(params.slug)
+    );
     if (!response.success) {
-      throw new Error(response.message as string);
+      throw notFound();
     }
-    if (!response.data) {
-      throw new Error("No data");
-    }
-    return {
-      problems: response.data,
-    };
   },
   component: RouteComponent,
   errorComponent: ({ error }) => <div>{JSON.stringify(error)}</div>,
+  notFoundComponent: () => <div>Problem not found</div>,
 });
 
 function RouteComponent() {
-  const { problems } = Route.useLoaderData();
+  const { slug } = Route.useParams();
+  const { data: problem } = useSuspenseQuery(
+    getProblemDetailQueryOptions(slug as string)
+  );
+
+  if (!problem) {
+    return null;
+  }
+
   return (
     <ResizablePanelGroup
       direction="horizontal"
@@ -60,11 +66,11 @@ function RouteComponent() {
             className="px-4 py-6 relative flex-1 space-y-4"
           >
             <h1 className="text-2xl font-semibold">
-              {problems.index}. {problems.title}
+              {problem.index}. {problem.title}
             </h1>
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary" className="text-yellow-500">
-                {problems.difficulty}
+                {problem.difficulty}
               </Badge>
               {/* {problems.topics.map((topic) => (
                 <Badge variant="secondary" key={topic.slug}>
@@ -72,7 +78,7 @@ function RouteComponent() {
                 </Badge>
               ))} */}
             </div>
-            <p>{problems.description}</p>
+            <p>{problem.description}</p>
             <Accordion type="multiple">
               <AccordionItem value="item-1">
                 <AccordionTrigger className="hover:no-underline">

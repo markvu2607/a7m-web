@@ -1,36 +1,24 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { getProblems } from "@/features/problems/services";
+import { getProblemsQueryOptions } from "@/features/problems/queries/get-problems";
+import { ProblemCard } from "@/features/problems/components/problem-card";
 
 export const Route = createFileRoute("/_authed/problems/")({
-  loader: async () => {
-    const response = await getProblems();
-    if (!response.success) {
-      throw new Error(response.message as string);
-    }
-    if (!response.data) {
-      throw new Error("No data");
-    }
-    return {
-      problems: response.data,
-    };
+  loader: async ({ context: { queryClient } }) => {
+    await queryClient.ensureQueryData(getProblemsQueryOptions);
   },
   component: RouteComponent,
+  pendingComponent: () => <div>Loading...</div>,
 });
 
 function RouteComponent() {
-  const { problems } = Route.useLoaderData();
+  const { data: problems } = useSuspenseQuery(getProblemsQueryOptions);
   return (
-    <div>
-      <h1>Problems</h1>
-      {problems.map((problem) => (
-        <Link
-          to="/problems/$slug"
-          params={{ slug: problem.slug }}
-          key={problem.slug}
-        >
-          <h2>{problem.title}</h2>
-        </Link>
+    <div className="mx-auto w-full max-w-screen-xl space-y-4">
+      <h1 className="font-bold text-2xl">Problem list</h1>
+      {problems.data?.map((problem) => (
+        <ProblemCard key={problem.slug} problem={problem} />
       ))}
     </div>
   );
