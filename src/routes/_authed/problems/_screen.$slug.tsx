@@ -1,3 +1,4 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import {
   ListPlusIcon,
@@ -23,7 +24,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeAction } from "@/features/problems/components/code-action";
 import { CodeEditor } from "@/features/problems/components/code-editor";
 import { getProblemDetailQueryOptions } from "@/features/problems/queries/get-problem-detail";
-import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authed/problems/_screen/$slug")({
   loader: async ({ context: { queryClient }, params }) => {
@@ -69,8 +69,8 @@ function RouteComponent() {
               {problem.index}. {problem.title}
             </h1>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className="text-yellow-500">
-                {problem.difficulty}
+              <Badge variant="secondary" className="text-yellow-500 capitalize">
+                {problem.difficulty.toLocaleLowerCase()}
               </Badge>
               {/* {problems.topics.map((topic) => (
                 <Badge variant="secondary" key={topic.slug}>
