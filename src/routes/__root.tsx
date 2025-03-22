@@ -11,7 +11,6 @@ import { useAuth } from "@/features/auth/store";
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
     loader: async () => {
-      console.log("loader");
       const { token, user } = useAuth.getState();
       if (token && !user) {
         const response = await getMe();
