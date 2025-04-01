@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
 import "./index.css";
 
+// TODO: should config global message with meta
 const queryClient = new QueryClient();
 
 // Create a new router instance

@@ -37,3 +37,9 @@ export const submitCode = ({
     code,
     language: "python",
   });
+
+export const getSubmissionById = (submissionId: string) =>
+  api.get(`/submissions/${submissionId}`);
+
+export const getSubmissionsByProblemSlug = (problemSlug: string) =>
+  api.get(`/submissions/problem/${problemSlug}`);

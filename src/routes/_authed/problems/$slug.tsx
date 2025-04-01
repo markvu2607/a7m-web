@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authed/problems/_screen")({
+export const Route = createFileRoute("/_authed/problems/$slug")({
   component: ScreenLayout,
 });
 

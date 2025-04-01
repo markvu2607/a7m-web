@@ -1,18 +1,22 @@
+import { useQuery } from "@tanstack/react-query";
+
 import { Input } from "@/components/ui/input";
 
-type Props = {
-  submissionResult: {
-    status: string;
-    language: string;
-    code: string;
-  };
-};
+import { getSubmissionDetailQueryOptions } from "../queries/get-submission-detail";
+import { useSubmission } from "../stores/use-submission-store";
 
-export const ProblemSubmissionResult = ({ submissionResult }: Props) => {
+export const ProblemSubmissionResult = () => {
+  const submissionId = useSubmission();
+  const { data: submission } = useQuery(
+    getSubmissionDetailQueryOptions(submissionId)
+  );
+
+  console.log(submission);
+
   return (
     <div className="space-y-4">
       <p className="text-sm font-medium text-gray-500">Status</p>
-      <Input value={submissionResult?.status} />
+      <Input value={submission?.status} />
     </div>
   );
 };

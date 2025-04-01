@@ -5,6 +5,8 @@ import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { Toaster } from "sonner";
 
 import { Header } from "@/components/layout/header";
+import { Navbar } from "@/components/layout/navbar";
+import { UserMenu } from "@/components/layout/user-menu";
 import { getMe } from "@/features/auth/services";
 import { useAuth } from "@/features/auth/store";
 
@@ -21,14 +23,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         }
       }
     },
-    component: () => (
-      <>
-        <Header />
-        <Outlet />
-        <Toaster />
-        <ReactQueryDevtools />
-        <TanStackRouterDevtools />
-      </>
-    ),
+    component: RootLayout,
   }
 );
+
+function RootLayout() {
+  return (
+    <>
+      <Header>
+        <Navbar />
+        <UserMenu />
+      </Header>
+      <Outlet />
+      <Toaster />
+      <ReactQueryDevtools />
+      <TanStackRouterDevtools />
+    </>
+  );
+}

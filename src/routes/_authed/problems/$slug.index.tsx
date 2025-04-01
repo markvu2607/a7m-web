@@ -12,17 +12,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeAction } from "@/features/problems/components/code-action";
 import { CodeEditor } from "@/features/problems/components/code-editor";
 import { ProblemDescription } from "@/features/problems/components/problem-description";
-import { ProblemSubmissions } from "@/features/problems/components/problem-submisions";
+import { ProblemSolutions } from "@/features/problems/components/problem-solutions";
+import { SubmissionTable } from "@/features/problems/components/submission-table";
+import { ProblemSubmissionResult } from "@/features/problems/components/problem-submission-result";
 import { getProblemDetailQueryOptions } from "@/features/problems/queries/get-problem-detail";
 import { runCode, submitCode } from "@/features/problems/services";
+import {
+  useCode,
+  useCodeActions,
+} from "@/features/problems/stores/use-code-store";
+import {
+  useSubmission,
+  useSubmissionActions,
+} from "@/features/problems/stores/use-submission-store";
 import { Testcase } from "@/features/problems/types";
-import { useCode } from "@/features/problems/stores/use-code-store";
-import { useCodeActions } from "@/features/problems/stores/use-code-store";
 import { cn } from "@/lib/utils";
-import { ProblemSolutions } from "@/features/problems/components/problem-solutions";
-import { ProblemSubmissionResult } from "@/features/problems/components/problem-submission-result";
 
-export const Route = createFileRoute("/_authed/problems/_screen/$slug")({
+export const Route = createFileRoute("/_authed/problems/$slug/")({
   loader: async ({ context: { queryClient }, params }) => {
     const response = await queryClient.ensureQueryData(
       getProblemDetailQueryOptions(params.slug)
@@ -58,14 +64,9 @@ function RouteComponent() {
       output: string;
     }[]
   >([]);
-  const [submissionResult, setSubmissionResult] = useState<
-    | {
-        status: string;
-        language: string;
-        code: string;
-      }
-    | undefined
-  >(undefined);
+
+  const submissionId = useSubmission();
+  const { setSubmissionId } = useSubmissionActions();
 
   const isTestResultVisible = testResult.length > 0;
 
@@ -101,7 +102,7 @@ function RouteComponent() {
       return submitCode({ problemSlug, code });
     },
     onSuccess: ({ data }) => {
-      setSubmissionResult(data);
+      setSubmissionId(data.submissionId);
       setActiveLeftTab("submission-result");
     },
   });
@@ -150,8 +151,8 @@ function RouteComponent() {
             <TabsTrigger key="submissions" value="submissions">
               Submissions
             </TabsTrigger>
-            {submissionResult && (
-              <TabsTrigger value="submission-result">
+            {submissionId && (
+              <TabsTrigger key="submission-result" value="submission-result">
                 Submission Result
               </TabsTrigger>
             )}
@@ -175,15 +176,15 @@ function RouteComponent() {
             value="submissions"
             className="px-4 py-6 relative flex-1 space-y-4"
           >
-            <ProblemSubmissions />
+            <SubmissionTable problemSlug={slug as string} />
           </TabsContent>
-          {submissionResult && (
+          {submissionId && (
             <TabsContent
               key="submission-result"
               value="submission-result"
               className="px-4 py-6 relative flex-1 space-y-4"
             >
-              <ProblemSubmissionResult submissionResult={submissionResult} />
+              <ProblemSubmissionResult />
             </TabsContent>
           )}
         </Tabs>

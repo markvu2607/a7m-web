@@ -8,33 +8,21 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as AuthedImport } from './routes/_authed'
+import { Route as AuthedRouteImport } from './routes/_authed/route'
 import { Route as publicRegisterImport } from './routes/(public)/register'
 import { Route as publicLoginImport } from './routes/(public)/login'
 import { Route as AuthedProblemsIndexImport } from './routes/_authed/problems/index'
-import { Route as AuthedProblemsScreenImport } from './routes/_authed/problems/_screen'
-import { Route as AuthedProblemsScreenSlugImport } from './routes/_authed/problems/_screen.$slug'
-
-// Create Virtual Routes
-
-const AuthedProblemsImport = createFileRoute('/_authed/problems')()
+import { Route as AuthedProblemsSlugImport } from './routes/_authed/problems/$slug'
+import { Route as AuthedProblemsSlugIndexImport } from './routes/_authed/problems/$slug.index'
 
 // Create/Update Routes
 
-const AuthedRoute = AuthedImport.update({
+const AuthedRouteRoute = AuthedRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRoute,
-} as any)
-
-const AuthedProblemsRoute = AuthedProblemsImport.update({
-  id: '/problems',
-  path: '/problems',
-  getParentRoute: () => AuthedRoute,
 } as any)
 
 const publicRegisterRoute = publicRegisterImport.update({
@@ -50,20 +38,21 @@ const publicLoginRoute = publicLoginImport.update({
 } as any)
 
 const AuthedProblemsIndexRoute = AuthedProblemsIndexImport.update({
+  id: '/problems/',
+  path: '/problems/',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+
+const AuthedProblemsSlugRoute = AuthedProblemsSlugImport.update({
+  id: '/problems/$slug',
+  path: '/problems/$slug',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
+
+const AuthedProblemsSlugIndexRoute = AuthedProblemsSlugIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthedProblemsRoute,
-} as any)
-
-const AuthedProblemsScreenRoute = AuthedProblemsScreenImport.update({
-  id: '/_screen',
-  getParentRoute: () => AuthedProblemsRoute,
-} as any)
-
-const AuthedProblemsScreenSlugRoute = AuthedProblemsScreenSlugImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => AuthedProblemsScreenRoute,
+  getParentRoute: () => AuthedProblemsSlugRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -74,7 +63,7 @@ declare module '@tanstack/react-router' {
       id: '/_authed'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof AuthedImport
+      preLoaderRoute: typeof AuthedRouteImport
       parentRoute: typeof rootRoute
     }
     '/(public)/login': {
@@ -91,101 +80,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof publicRegisterImport
       parentRoute: typeof rootRoute
     }
-    '/_authed/problems': {
-      id: '/_authed/problems'
-      path: '/problems'
-      fullPath: '/problems'
-      preLoaderRoute: typeof AuthedProblemsImport
-      parentRoute: typeof AuthedImport
-    }
-    '/_authed/problems/_screen': {
-      id: '/_authed/problems/_screen'
-      path: '/problems'
-      fullPath: '/problems'
-      preLoaderRoute: typeof AuthedProblemsScreenImport
-      parentRoute: typeof AuthedProblemsRoute
+    '/_authed/problems/$slug': {
+      id: '/_authed/problems/$slug'
+      path: '/problems/$slug'
+      fullPath: '/problems/$slug'
+      preLoaderRoute: typeof AuthedProblemsSlugImport
+      parentRoute: typeof AuthedRouteImport
     }
     '/_authed/problems/': {
       id: '/_authed/problems/'
-      path: '/'
-      fullPath: '/problems/'
+      path: '/problems'
+      fullPath: '/problems'
       preLoaderRoute: typeof AuthedProblemsIndexImport
-      parentRoute: typeof AuthedProblemsImport
+      parentRoute: typeof AuthedRouteImport
     }
-    '/_authed/problems/_screen/$slug': {
-      id: '/_authed/problems/_screen/$slug'
-      path: '/$slug'
-      fullPath: '/problems/$slug'
-      preLoaderRoute: typeof AuthedProblemsScreenSlugImport
-      parentRoute: typeof AuthedProblemsScreenImport
+    '/_authed/problems/$slug/': {
+      id: '/_authed/problems/$slug/'
+      path: '/'
+      fullPath: '/problems/$slug/'
+      preLoaderRoute: typeof AuthedProblemsSlugIndexImport
+      parentRoute: typeof AuthedProblemsSlugImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface AuthedProblemsScreenRouteChildren {
-  AuthedProblemsScreenSlugRoute: typeof AuthedProblemsScreenSlugRoute
+interface AuthedProblemsSlugRouteChildren {
+  AuthedProblemsSlugIndexRoute: typeof AuthedProblemsSlugIndexRoute
 }
 
-const AuthedProblemsScreenRouteChildren: AuthedProblemsScreenRouteChildren = {
-  AuthedProblemsScreenSlugRoute: AuthedProblemsScreenSlugRoute,
+const AuthedProblemsSlugRouteChildren: AuthedProblemsSlugRouteChildren = {
+  AuthedProblemsSlugIndexRoute: AuthedProblemsSlugIndexRoute,
 }
 
-const AuthedProblemsScreenRouteWithChildren =
-  AuthedProblemsScreenRoute._addFileChildren(AuthedProblemsScreenRouteChildren)
+const AuthedProblemsSlugRouteWithChildren =
+  AuthedProblemsSlugRoute._addFileChildren(AuthedProblemsSlugRouteChildren)
 
-interface AuthedProblemsRouteChildren {
-  AuthedProblemsScreenRoute: typeof AuthedProblemsScreenRouteWithChildren
+interface AuthedRouteRouteChildren {
+  AuthedProblemsSlugRoute: typeof AuthedProblemsSlugRouteWithChildren
   AuthedProblemsIndexRoute: typeof AuthedProblemsIndexRoute
 }
 
-const AuthedProblemsRouteChildren: AuthedProblemsRouteChildren = {
-  AuthedProblemsScreenRoute: AuthedProblemsScreenRouteWithChildren,
+const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
+  AuthedProblemsSlugRoute: AuthedProblemsSlugRouteWithChildren,
   AuthedProblemsIndexRoute: AuthedProblemsIndexRoute,
 }
 
-const AuthedProblemsRouteWithChildren = AuthedProblemsRoute._addFileChildren(
-  AuthedProblemsRouteChildren,
+const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
+  AuthedRouteRouteChildren,
 )
 
-interface AuthedRouteChildren {
-  AuthedProblemsRoute: typeof AuthedProblemsRouteWithChildren
-}
-
-const AuthedRouteChildren: AuthedRouteChildren = {
-  AuthedProblemsRoute: AuthedProblemsRouteWithChildren,
-}
-
-const AuthedRouteWithChildren =
-  AuthedRoute._addFileChildren(AuthedRouteChildren)
-
 export interface FileRoutesByFullPath {
-  '': typeof AuthedRouteWithChildren
+  '': typeof AuthedRouteRouteWithChildren
   '/login': typeof publicLoginRoute
   '/register': typeof publicRegisterRoute
-  '/problems': typeof AuthedProblemsScreenRouteWithChildren
-  '/problems/': typeof AuthedProblemsIndexRoute
-  '/problems/$slug': typeof AuthedProblemsScreenSlugRoute
+  '/problems/$slug': typeof AuthedProblemsSlugRouteWithChildren
+  '/problems': typeof AuthedProblemsIndexRoute
+  '/problems/$slug/': typeof AuthedProblemsSlugIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '': typeof AuthedRouteWithChildren
+  '': typeof AuthedRouteRouteWithChildren
   '/login': typeof publicLoginRoute
   '/register': typeof publicRegisterRoute
   '/problems': typeof AuthedProblemsIndexRoute
-  '/problems/$slug': typeof AuthedProblemsScreenSlugRoute
+  '/problems/$slug': typeof AuthedProblemsSlugIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/_authed': typeof AuthedRouteWithChildren
+  '/_authed': typeof AuthedRouteRouteWithChildren
   '/(public)/login': typeof publicLoginRoute
   '/(public)/register': typeof publicRegisterRoute
-  '/_authed/problems': typeof AuthedProblemsRouteWithChildren
-  '/_authed/problems/_screen': typeof AuthedProblemsScreenRouteWithChildren
+  '/_authed/problems/$slug': typeof AuthedProblemsSlugRouteWithChildren
   '/_authed/problems/': typeof AuthedProblemsIndexRoute
-  '/_authed/problems/_screen/$slug': typeof AuthedProblemsScreenSlugRoute
+  '/_authed/problems/$slug/': typeof AuthedProblemsSlugIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -194,9 +164,9 @@ export interface FileRouteTypes {
     | ''
     | '/login'
     | '/register'
-    | '/problems'
-    | '/problems/'
     | '/problems/$slug'
+    | '/problems'
+    | '/problems/$slug/'
   fileRoutesByTo: FileRoutesByTo
   to: '' | '/login' | '/register' | '/problems' | '/problems/$slug'
   id:
@@ -204,21 +174,20 @@ export interface FileRouteTypes {
     | '/_authed'
     | '/(public)/login'
     | '/(public)/register'
-    | '/_authed/problems'
-    | '/_authed/problems/_screen'
+    | '/_authed/problems/$slug'
     | '/_authed/problems/'
-    | '/_authed/problems/_screen/$slug'
+    | '/_authed/problems/$slug/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  AuthedRoute: typeof AuthedRouteWithChildren
+  AuthedRouteRoute: typeof AuthedRouteRouteWithChildren
   publicLoginRoute: typeof publicLoginRoute
   publicRegisterRoute: typeof publicRegisterRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  AuthedRoute: AuthedRouteWithChildren,
+  AuthedRouteRoute: AuthedRouteRouteWithChildren,
   publicLoginRoute: publicLoginRoute,
   publicRegisterRoute: publicRegisterRoute,
 }
@@ -239,9 +208,10 @@ export const routeTree = rootRoute
       ]
     },
     "/_authed": {
-      "filePath": "_authed.tsx",
+      "filePath": "_authed/route.tsx",
       "children": [
-        "/_authed/problems"
+        "/_authed/problems/$slug",
+        "/_authed/problems/"
       ]
     },
     "/(public)/login": {
@@ -250,28 +220,20 @@ export const routeTree = rootRoute
     "/(public)/register": {
       "filePath": "(public)/register.tsx"
     },
-    "/_authed/problems": {
-      "filePath": "_authed/problems",
+    "/_authed/problems/$slug": {
+      "filePath": "_authed/problems/$slug.tsx",
       "parent": "/_authed",
       "children": [
-        "/_authed/problems/_screen",
-        "/_authed/problems/"
-      ]
-    },
-    "/_authed/problems/_screen": {
-      "filePath": "_authed/problems/_screen.tsx",
-      "parent": "/_authed/problems",
-      "children": [
-        "/_authed/problems/_screen/$slug"
+        "/_authed/problems/$slug/"
       ]
     },
     "/_authed/problems/": {
       "filePath": "_authed/problems/index.tsx",
-      "parent": "/_authed/problems"
+      "parent": "/_authed"
     },
-    "/_authed/problems/_screen/$slug": {
-      "filePath": "_authed/problems/_screen.$slug.tsx",
-      "parent": "/_authed/problems/_screen"
+    "/_authed/problems/$slug/": {
+      "filePath": "_authed/problems/$slug.index.tsx",
+      "parent": "/_authed/problems/$slug"
     }
   }
 }
